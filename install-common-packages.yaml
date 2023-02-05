@@ -1,0 +1,5 @@
+- name: install common packages and extra tools
+  hosts: all
+  become: yes
+  roles:
+    - common-packages

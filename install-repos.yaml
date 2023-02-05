@@ -1,0 +1,5 @@
+- name: registering redhat and installing repos
+  hosts: all
+  become: yes
+  roles:
+    - repos

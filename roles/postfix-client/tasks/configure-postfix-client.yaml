@@ -1,0 +1,19 @@
+---
+- name: install postfix and mailx
+  yum:
+    name: 
+      - postfix
+      - mailx
+
+- name: Copy main.cf
+  template:
+    dest: /etc/postfix/main.cf
+    src: roles/postfix-client/templates/clientmain.cf
+    mode: '0644'
+  notify: restart postfix
+
+- name: Enable postfix
+  service:
+    enabled: yes 
+    name: postfix
+

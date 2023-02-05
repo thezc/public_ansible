@@ -1,0 +1,153 @@
+---
+#- name: add mariadb repo
+#  yum:
+#    name: https://xyz-{{ ansible_distribution_major_version }}.noarch.rpm
+- name: copy mariadb.repo
+  copy:
+    src: files/mariadb.repo
+    dest: /etc/yum.repos.d/mariadb.repo
+    owner: root
+    group: root
+    mode: 0644
+
+- name: copy mariadb gpg key
+  copy:
+    src: files/MariaDB-Server-GPG-KEY
+    dest: /etc/pki/rpm-gpg/MariaDB-Server-GPG-KEY
+    owner: root
+    group: root
+    mode: 0644
+
+
+- name: install mysql client
+  dnf:
+    name: mariadb
+    state: present
+
+- name: install mysql-server
+  dnf:
+    name: mariadb-server
+    state: present
+
+- name: install mysql-python
+  dnf:
+    name: python3-mysql
+    state: present
+
+- name: start and enable mysql service
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+
+- name: set mysql root password
+  mysql_user:
+    user: root
+    host: localhost
+    password: "{{ zabbix_mysqlrootpw }}"
+
+- name: copy .my.cnf file with root password credentials
+  template:
+    src: files/my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: 0600
+
+- name: delete anonymous mysql server user for $server_hostname
+  mysql_user:
+    user: ""
+    host: "$server_hostname"
+    state: absent
+    
+- name: delete anonymous mysql server user for localhost
+  mysql_user:
+    user: ""
+    state: absent
+
+- name: remove the mysql test database
+  mysql_db:
+    db: test
+    state: absent
+
+# how to set the character set
+# mysql> create database zabbix character set utf8mb4 collate utf8mb4_bin;
+- name: create the zabbix db
+  mysql_db:
+    name: zabbix
+    collation: utf8mb4_bin
+    state: present
+
+
+- name: install zabbix-server-mysql
+  dnf:
+    name: zabbix-server-mysql
+
+- name: import zabbix db schema
+  mysql_db:
+    login_user: root
+    db: zabbix
+    state: import
+    target: /usr/share/zabbix-sql-scripts/mysql/server.sql.gz
+#  when: zabbix_db_created.changed
+
+- name: create the zabbix user
+  mysql_user:
+    name: "{{ zabbix_dbuser }}"
+    password: "{{ zabbix_dbpassword }}"
+    priv: zabbix.*:ALL
+
+- name: start and enable zabbix-server
+  service:
+    name: zabbix-server
+    state: started
+    enabled: yes
+
+- name: start and enable zabbix-agent
+  service:
+    name: zabbix-agent
+    state: started
+    enabled: yes
+
+- name: start and enable httpd
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+
+- name: start and enable php-fpm
+  service:
+    name: php-fpm
+    state: started
+    enabled: yes
+
+- name: copy zabbix_server.conf
+  template:
+    src: files/zabbix_server.conf.j2
+    dest: /etc/zabbix/zabbix_server.conf
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Disable SELinux
+  selinux:
+    state: disabled
+
+- name: restart httpd
+  service:
+    name: httpd
+    state: restarted
+    enabled: true
+
+- name: restart zabbix-server
+  service:
+    name: zabbix-server
+    state: restarted
+    enabled: true
+
+- name: restart zabbix-agent
+  service:
+    name: zabbix-agent
+    state: restarted
+    enabled: true
+

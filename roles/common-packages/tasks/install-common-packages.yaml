@@ -1,0 +1,35 @@
+---
+- name: Temporarily Enable RHUI Repo - RH7
+  ignore_errors: no
+  shell: "yum-config-manager --enable rhel-7-server-rhui-optional-rpms"
+  when: (ansible_distribution == 'RedHat' and ansible_distribution_major_version == "7")
+
+- name: Temporarily Enable RHUI Repo - RH8
+  ignore_errors: no
+  shell: "yum-config-manager --enable rhel-8-server-rhui-optional-rpms"
+  when: (ansible_distribution == 'RedHat' and ansible_distribution_major_version == "8")
+
+- name: Install Common Packages and Tools
+  ignore_errors: yes
+  yum:
+    name:
+      - "@Development Tools"
+      - bind-utils
+      - dos2unix
+      - fping
+      - htop
+      - iftop
+      - iotop
+      - iperf
+      - iperf3
+      - lsof
+      - make
+      - net-tools
+      - nfs-utils
+      - python3
+      - python3-pip
+      - rsync
+      - screen
+      - telnet
+      - tree
+      - vim

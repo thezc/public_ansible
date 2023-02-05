@@ -1,0 +1,44 @@
+---
+- name: Disable SELinux for lustre
+  ignore_errors: no
+  selinux:
+    state: disabled
+
+- name: Install Lustre Client SW
+  yum:
+    disable_gpg_check: yes
+    name:
+      - kmod-lustre-client
+      - lustre-client
+
+- name: Mount /scratch Directory
+  mount:
+    path: /scratch
+    fstype: lustre
+    opts: defaults,noatime,flock,_netdev
+    src: {{ scratch_mount }}
+    dump: '0'
+    passno: '0'
+    state: mounted
+
+- name: Mount /data Directory
+  ignore_errors: yes
+  mount:
+    path: /data
+    fstype: lustre
+    opts: defaults,noatime,flock,_netdev
+    src: {{ data_mount }}
+    dump: '0'
+    passno: '0'
+    state: mounted
+
+- name: Mount /home Directory
+  ignore_errors: yes
+  mount:
+    path: /home
+    fstype: lustre
+    opts: defaults,noatime,flock,_netdev
+    src: {{ home_mount }}
+    dump: '0'
+    passno: '0'
+    state: mounted

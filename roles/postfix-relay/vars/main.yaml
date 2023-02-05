@@ -1,0 +1,4 @@
+proxy_hostname: proxy
+domain: company.com
+hostname: "{{ ansible_hostname }}"
+postfix_app_pass: "{{ postfix_sasl_passwd }}" 

@@ -1,0 +1,13 @@
+plugin: aws_ec2
+regions:
+  - us-west-1
+  - us-east-1
+hostnames:
+  - tag:Name
+keyed_groups:
+ - key: 'security_groups|json_query("[].group_name")'
+   prefix: 'group'
+
+compose:
+  ansible_host: private_ip_address
+

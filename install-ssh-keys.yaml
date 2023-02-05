@@ -1,0 +1,5 @@
+- name: installing sys ssh keys
+  hosts: all
+  become: yes
+  roles:
+    - ssh-keys

@@ -1,0 +1,5 @@
+---
+- include_tasks: install-repos.yaml
+- include_tasks: install-zabbix-server.yaml
+- include_tasks: install-mariadb-server.yaml
+

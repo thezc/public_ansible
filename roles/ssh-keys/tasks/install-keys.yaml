@@ -1,0 +1,8 @@
+---
+- name: Add thezc public ssh key
+  authorized_key:
+    user: ec2-user
+	key: {{ zc_ssh_key }}
+  tags:
+    - sshkey
+

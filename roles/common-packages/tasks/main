@@ -1,0 +1,4 @@
+---
+- include_tasks: install-common-packages.yaml
+- include_tasks: install-extra-tools.yaml
+- include_tasks: post-setup.yaml

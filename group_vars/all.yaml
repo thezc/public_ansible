@@ -1,0 +1,9 @@
+---
+ansible_user: ec2-user
+ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %h:%p -q jumpbox"'
+proxy_username: "{{ lookup('env', 'PROXY_USERNAME') }}"
+proxy_password: "{{ lookup('env', 'PROXY_PASSWORD') }}"
+proxy_env:
+  http_proxy: "http://{{ proxy_username }}:{{ proxy_password }}@proxy:3128"
+  https_proxy: "http://{{ proxy_username }}:{{ proxy_password }}@proxy:3128"
+

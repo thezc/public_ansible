@@ -1,0 +1,45 @@
+---
+- name: Temporarily Enable RHUI Repo - RH7
+  ignore_errors: no
+  shell: "yum-config-manager --enable rhel-7-server-rhui-optional-rpms"
+  when: (ansible_distribution == 'RedHat' and ansible_distribution_major_version == "7")
+
+- name: Install Dependencies For Extra Tools
+  ignore_errors: yes
+  yum:
+    name:
+      - gperf
+      - texinfo-tex
+      - boost-devel
+  when: ansible_distribution_major_version == "7"
+  tags:
+    - build
+    - yum
+
+- name: Build Extra Tools
+  ignore_errors: yes
+  shell: |
+    make -j10 install &&
+    touch /root/{{ item }}.installed;
+  args:
+    chdir: "/data/src/{{ item }}"
+    creates: "/root/{{ item }}.installed"
+  with_items:
+    - gperf-3.1
+    - iverilog
+    - yosys
+  tags:
+    - build
+  when: ansible_distribution_major_version == "7"
+
+- name: Link to tkdiff
+  ignore_errors: yes
+  file:
+    path: /usr/local/bin/tkdiff
+    src: /data/src/tkdiff-5-3/tkdiff
+    state: link
+  tags:
+    - build
+  when: ansible_distribution_major_version == "7"
+
+

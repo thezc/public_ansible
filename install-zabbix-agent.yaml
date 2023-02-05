@@ -1,0 +1,6 @@
+- name: installing zabbix server
+  hosts: zabbix_agent_hosts
+  become: yes
+  roles:
+    - zabbix-agent
+  environment: "{{ proxy_env }}"

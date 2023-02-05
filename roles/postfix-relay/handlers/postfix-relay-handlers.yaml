@@ -1,0 +1,11 @@
+---
+- name: restart postfix
+  service:
+    name: postfix
+    state: restarted
+
+- name: restorecon sasl
+  shell: restorecon -Rv /etc/postfix/sasl/
+
+- name: postmap sasl_passwd
+  shell: postmap /etc/postfix/sasl/sasl_passwd

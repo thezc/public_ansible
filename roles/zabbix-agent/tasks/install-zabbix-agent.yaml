@@ -1,0 +1,21 @@
+---
+- name: install zabbix agent
+  yum:
+    name:
+      - zabbix-selinux-policy
+      - zabbix-agent
+    state: latest
+
+- name: copy zabbix_agentd.conf
+  template:
+    src: templates/zabbix_agentd.conf.j2
+    dest: /etc/zabbix/zabbix_agentd.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: restart zabbix-agent
+  service:
+    name: zabbix-agent
+    state: restarted
+    enabled: true

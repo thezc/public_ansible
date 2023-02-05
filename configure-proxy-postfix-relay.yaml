@@ -1,0 +1,7 @@
+---
+- name: setting up postfix relay
+  hosts: proxy
+  become: yes
+  environment: "{{ proxy_env }}"
+  roles:
+    - postfix-relay

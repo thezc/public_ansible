@@ -1,0 +1,7 @@
+---
+- name: setting up postfix clients for relay
+  hosts: host1, host2
+  become: yes
+  environment: "{{ proxy_env }}"
+  roles:
+    - postfix-client

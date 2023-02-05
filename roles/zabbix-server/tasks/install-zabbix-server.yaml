@@ -1,0 +1,16 @@
+---
+- name: switch dnf modules to php74
+  shell: dnf module switch-to php:7.4 -y
+
+- name: install zabbix server, frontend, agent
+  dnf:
+    name:
+      - zabbix-web-mysql
+      - zabbix-apache-conf
+      - zabbix-sql-scripts
+      - zabbix-selinux-policy
+      - zabbix-agent
+    state: latest
+
+
+

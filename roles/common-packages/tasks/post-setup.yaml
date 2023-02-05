@@ -1,0 +1,20 @@
+---
+- name: Disable PackageKit
+  ignore_errors: yes
+  systemd:
+    name: packagekit
+    state: stopped
+    enabled: false
+    masked: true
+
+- name: Run Package Cleanup on RH7 Boxes
+  shell: package-cleanup --oldkernels --count=2 -y
+  args:
+    warn: false
+  when: ansible_distribution_major_version == "7"
+
+- name: Remove Old Kernels on RH8 Boxes
+  shell: dnf remove --oldinstallonly --setopt installonly_limit=2 kernel -y
+  args:
+    warn: false
+  when: ansible_distribution_major_version == "8"

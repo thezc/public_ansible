@@ -1,0 +1,1 @@
+[smtp-relay.gmail.com]:587 postfix@company.com:{{ postfix_app_pass }}

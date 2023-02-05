@@ -1,0 +1,4 @@
+---
+- include_tasks: install-repos.yaml
+- include_tasks: install-zabbix-agent.yaml
+

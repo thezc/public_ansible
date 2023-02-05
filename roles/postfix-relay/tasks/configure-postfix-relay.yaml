@@ -1,0 +1,43 @@
+---
+- name: install postfix and mailx
+  yum:
+    name: 
+      - postfix
+      - mailx
+      - cyrus-sasl
+      - cyrus-sasl-plain
+
+- name: Copy main.cf
+  template:
+    dest: /etc/postfix/main.cf
+    src: roles/postfix-relay/templates/proxymain.cf
+    mode: '0644'
+  notify: restart postfix
+
+- name: Copy master.cf
+  template:
+    dest: /etc/postfix/master.cf
+    src: roles/postfix-relay/templates/master.cf
+    mode: '0644'
+  notify: restart postfix
+
+- name: create /etc/postfix/sasl directory
+  file:
+    path: /etc/postfix/sasl
+    state: directory
+    mode: '0700'
+
+- name: Copy sasl_passwd
+  template:
+    dest: /etc/postfix/sasl/sasl_passwd
+    src: roles/postfix-relay/templates/proxysasl_passwd
+    mode: '0600'
+  notify: 
+    - postmap sasl_passwd
+    - restorecon sasl
+    - restart postfix
+
+- name: Enable postfix
+  service:
+    enabled: yes
+    name: postfix

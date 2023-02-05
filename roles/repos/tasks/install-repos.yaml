@@ -1,0 +1,74 @@
+---
+- name: Register with Red Hat
+  ignore_errors: yes
+  community.general.redhat_subscription:
+    state: present
+    username: {{ redhat_user }}
+    password: {{ redhat_pass }}
+    auto_attach: true
+  when: ansible_distribution == 'RedHat'
+      
+- name: Add EPEL Key
+  ignore_errors: yes
+  rpm_key:
+    key: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
+
+- name: Add epel repo for RH7
+  yum:
+    name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
+    state: present
+  when: ansible_distribution_major_version == "7"
+
+- name: add epel repo for RH8
+  yum:
+    name: epel-release
+    state: present
+  when: ansible_distribution_major_version == "8"
+
+- name: Add FSx Repo for RH7
+  ignore_errors: yes
+  yum_repository:
+    name: aws-fsx
+    description: "FSx Repo for RH7"
+    baseurl: https://fsx-lustre-client-repo.s3.amazonaws.com/el/7/x86_64/
+    enabled: yes
+    gpgcheck: yes
+    gpgkey: https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc
+  when: ansible_distribution_major_version == "7"
+
+- name: Add FSx Repo for RH8
+  ignore_errors: yes
+  yum_repository:
+    name: aws-fsx
+    description: "FSx Repo for RH8"
+    baseurl: https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/$basearch/
+    enabled: yes
+    gpgcheck: yes
+    gpgkey: https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc
+  when: ansible_distribution_major_version == "8"
+
+- name: Add MS Repo
+  ignore_errors: yes
+  yum_repository:
+    name: vscode
+    description: "Visual Studio Code"
+    baseurl: https://packages.microsoft.com/yumrepos/vscode
+    enabled: yes
+    gpgcheck: yes
+    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+
+- name: Temporarily Enable RHUI Repo - RH7
+  ignore_errors: no
+  shell: "yum-config-manager --enable rhel-7-server-rhui-optional-rpms"
+  when: (ansible_distribution == 'RedHat' and ansible_distribution_major_version == "7")
+  
+- name: Run Yum Clean All
+  shell: yum clean all
+  args:
+    warn: false
+
+- name: Run Yum Update
+  yum:
+    name: '*'
+    state: latest
+
